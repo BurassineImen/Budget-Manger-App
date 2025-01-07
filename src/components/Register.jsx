@@ -1,19 +1,28 @@
-import { Form, Link } from "react-router-dom";
+// Register.jsx
+import React from "react";
+import { Form } from "react-router-dom";
 import { UserPlusIcon } from "@heroicons/react/24/solid";
 import illustration from "../assets/illustration.jpg";
 
-const Intro = () => {
+const Register = () => {
   return (
     <div className="intro">
       <div>
         <h1>
-          Take Control of <span className="accent">Your Money</span>
+          Welcome to <span className="accent">Your Financial Hub</span>
         </h1>
         <p>
-          Personal budgeting is the secret to financial freedom. Start your journey today.
+          Join us and take the first step toward managing your finances effectively!
         </p>
-        {/* Formulaire de connexion avec email et mot de passe */}
         <Form method="post">
+          <input
+            type="text"
+            name="userName"
+            required
+            placeholder="Enter your username"
+            aria-label="Your Username"
+            autoComplete="username"
+          />
           <input
             type="email"
             name="email"
@@ -30,21 +39,16 @@ const Intro = () => {
             aria-label="Your Password"
             autoComplete="new-password"
           />
-          <input type="hidden" name="_action" value="loginUser" />
+          <input type="hidden" name="_action" value="registerUser" />
           <button type="submit" className="btn btn--dark">
-            <span>Login</span>
+            <span>Register</span>
             <UserPlusIcon width={20} />
           </button>
         </Form>
-
-        {/* Lien vers la page d'inscription */}
-        <Link to="/register" className="btn btn--light">
-          <span>Create New Account</span>
-        </Link>
       </div>
-      <img src={illustration} alt="Person with money" width={600} />
+      <img src={illustration} alt="Person planning finances" width={600} />
     </div>
   );
 };
 
-export default Intro;
+export default Register;

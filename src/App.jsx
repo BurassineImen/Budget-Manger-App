@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider,} from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 // Library
 import { ToastContainer } from 'react-toastify';
@@ -9,6 +9,7 @@ import Dashboard, { dashboardAction, dashboardLoader } from "./pages/Dashboard";
 import Error from "./pages/Error";
 import Main, { mainLoader } from "./layouts/Main";
 import { logoutAction } from "./actions/logout";
+import Register from "./components/Register"; // Importer le composant Register
 
 const router = createBrowserRouter([
   {
@@ -22,23 +23,27 @@ const router = createBrowserRouter([
         element: <Dashboard />,
         loader: dashboardLoader,
         action: dashboardAction,
-        errorElement: <Error />
+        errorElement: <Error />,
+      },
+      {
+        path: "register", // Ajout de la route pour la page Register
+        element: <Register />,
       },
       {
         path: "logout",
         action: logoutAction,
-        
-        
-      }
-    ]
+      },
+    ],
   },
 ]);
 
 function App() {
-  return <div className="App">
-    <RouterProvider router={router} />
-    <ToastContainer />
-  </div>;
+  return (
+    <div className="App">
+      <RouterProvider router={router} />
+      <ToastContainer />
+    </div>
+  );
 }
 
 export default App;
