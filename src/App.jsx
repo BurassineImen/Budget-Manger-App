@@ -10,6 +10,8 @@ import Error from "./pages/Error";
 import Main, { mainLoader } from "./layouts/Main";
 import { logoutAction } from "./actions/logout";
 import Register from "./components/Register"; // Importer le composant Register
+import Blanco, { blancoLoader } from "./components/Blanco";
+
 
 const router = createBrowserRouter([
   {
@@ -25,8 +27,21 @@ const router = createBrowserRouter([
         action: dashboardAction,
         errorElement: <Error />,
       },
+     /*  {
+        path: "dashboard", // Route explicite pour "/dashboard"
+        element: <Dashboard />,
+        loader: dashboardLoader,
+        action: dashboardAction,
+        errorElement: <Error />,
+      }, */
       {
-        path: "register", // Ajout de la route pour la page Register
+        path: "blanco",
+        element: <Blanco />,
+        loader: blancoLoader,
+        errorElement: <Error />,
+      },
+      {
+        path: "register",
         element: <Register />,
       },
       {

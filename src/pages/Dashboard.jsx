@@ -1,91 +1,82 @@
-// rrd imports
 import { useLoaderData } from "react-router-dom";
-
-// library imports
 import { toast } from "react-toastify";
 
-// components
+// Components
 import Intro from "../components/Intro";
 import AddBudgetForm from "../components/AddBudgetForm";
 import AddExpenseForm from "../components/AddExpenseForm";
-
-//  helper functions
-import { createBudget, createExpense, fetchData, waait } from "../helpers"
 import BudgetItem from "../components/BudgetItem";
 
-// loader
+// Helper functions
+import { createBudget, createExpense, fetchData, waait } from "../helpers";
+
+// Loader
 export function dashboardLoader() {
-  const userName = fetchData("userName");
-  const userEmail = fetchData("userEmail"); // Ajout de l'email
+
+
+  const name = fetchData("name");
+  const userEmail = fetchData("userEmail");
   const budgets = fetchData("budgets");
-  return { userName, userEmail, budgets };
+  return { name, userEmail, budgets };
 }
 
-
-// action
+// Action
 export async function dashboardAction({ request }) {
   await waait();
 
-  const data = await request.formData();
-  const { _action, ...values } = Object.fromEntries(data);
+  const formData = await request.formData();
+  const { _action, ...values } = Object.fromEntries(formData);
 
-  if (_action === "registerUser") {
-    try {
-      localStorage.setItem("userName", JSON.stringify(values.userName));
-      localStorage.setItem("userEmail", JSON.stringify(values.email)); // Sauvegarder l'email
+  try {
+    if (_action === "registerUser") {
+      localStorage.setItem("name", JSON.stringify(values.name));
+      localStorage.setItem("userEmail", JSON.stringify(values.email));
       localStorage.setItem("userPassword", JSON.stringify(values.password));
       return toast.success(`Account created for ${values.userName}!`);
-    } catch (e) {
-      throw new Error("There was a problem creating your account.");
     }
-  }
 
-  // Autres actions (budget et dépenses)
-  if (_action === "createBudget") {
-    try {
+    if (_action === "createBudget") {
       createBudget({
         name: values.newBudget,
-        amount: values.newBudgetAmount,
+        amount: parseFloat(values.newBudgetAmount),
       });
-      return toast.success("Budget created!");
-    } catch (e) {
-      throw new Error("There was a problem creating your budget.");
+      return toast.success("Budget created successfully!");
     }
-  }
 
-  if (_action === "createExpense") {
-    try {
+    if (_action === "createExpense") {
       createExpense({
         name: values.newExpense,
-        amount: values.newExpenseAmount,
+        amount: parseFloat(values.newExpenseAmount),
         budgetId: values.newExpenseBudget,
       });
-      return toast.success(`Expense ${values.newExpense} created!`);
-    } catch (e) {
-      throw new Error("There was a problem creating your expense.");
+      return toast.success(`Expense "${values.newExpense}" created successfully!`);
     }
+  } catch (error) {
+    console.error("Error during action processing:", error);
+    throw new Error("An unexpected error occurred.");
   }
 }
 
-
+// Dashboard Component
 const Dashboard = () => {
-  const { userName, userEmail, budgets } = useLoaderData();
+  
+  const { name, userEmail, budgets } = useLoaderData();
 
   return (
     <>
-      {userName && userEmail ? (
+      {name && userEmail ? (
         <div className="dashboard">
           <h1>
-            Welcome back, <span className="accent">{userName}</span>
+            Welcome back, <span className="accent">{name}</span>!
           </h1>
           <div className="grid-sm">
-            {budgets && budgets.length > 0 ? (
+            {budgets?.length > 0 ? (
               <div className="grid-lg">
                 <div className="flex-lg">
                   <AddBudgetForm />
                   <AddExpenseForm budgets={budgets} />
                 </div>
-                <h2>Existing Budgets</h2>
+                <h2>Your Budgets</h2>
                 <div className="budgets">
                   {budgets.map((budget) => (
                     <BudgetItem key={budget.id} budget={budget} />
@@ -94,8 +85,7 @@ const Dashboard = () => {
               </div>
             ) : (
               <div className="grid-sm">
-                <p>Personal budgeting is the secret to financial freedom.</p>
-                <p>Create a budget to get started!</p>
+                <p>Start your journey by creating your first budget.</p>
                 <AddBudgetForm />
               </div>
             )}
@@ -107,4 +97,5 @@ const Dashboard = () => {
     </>
   );
 };
+
 export default Dashboard;

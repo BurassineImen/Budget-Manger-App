@@ -1,10 +1,53 @@
-// Register.jsx
-import React from "react";
-import { Form } from "react-router-dom";
+import React, { useState } from "react";
+import { Form, useNavigate } from "react-router-dom";
 import { UserPlusIcon } from "@heroicons/react/24/solid";
 import illustration from "../assets/illustration.jpg";
+import api from "../api";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Register = () => {
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate(); // Initialiser le hook de navigation
+
+  const handleRegister = async (event) => {
+  event.preventDefault();
+  setLoading(true);
+
+  const formData = new FormData(event.target);
+  const data = {
+    name: formData.get("name"),
+    email: formData.get("email"),
+    password: formData.get("password"),
+  };
+
+  try {
+    const response = await api.post("/Auth/register", data); // Appel API pour enregistrer
+    if (response.status === 200) {
+      toast.success("Registration successful! Logging you in...");
+      
+      // Effectuez une connexion automatique après l'inscription
+      const loginResponse = await api.post("/Auth/login", {
+        email: data.email,
+        password: data.password,
+      });
+      if (loginResponse.status === 200) {
+        const token = loginResponse.data;
+        localStorage.setItem("authToken", token); // Stocker le token
+        setTimeout(() => {
+          navigate("/"); // Redirection
+        }, 2000);
+      }
+    }
+  } catch (error) {
+    console.error("Error during registration:", error);
+    toast.error("Registration failed. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
   return (
     <div className="intro">
       <div>
@@ -14,10 +57,10 @@ const Register = () => {
         <p>
           Join us and take the first step toward managing your finances effectively!
         </p>
-        <Form method="post">
+        <Form method="post" onSubmit={handleRegister}>
           <input
             type="text"
-            name="userName"
+            name="name"
             required
             placeholder="Enter your username"
             aria-label="Your Username"
@@ -39,14 +82,13 @@ const Register = () => {
             aria-label="Your Password"
             autoComplete="new-password"
           />
-          <input type="hidden" name="_action" value="registerUser" />
-          <button type="submit" className="btn btn--dark">
-            <span>Register</span>
-            <UserPlusIcon width={20} />
+          <button type="submit" className="btn btn--dark" disabled={loading}>
+            {loading ? <span>Loading...</span> : <><span>Register</span><UserPlusIcon width={20} /></>}
           </button>
         </Form>
       </div>
       <img src={illustration} alt="Person planning finances" width={600} />
+      <ToastContainer />
     </div>
   );
 };
